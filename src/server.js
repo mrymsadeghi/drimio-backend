@@ -28,6 +28,10 @@ function requireString(value, fieldName) {
   return value.trim();
 }
 
+function optionalString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 function handleRoute(handler) {
   return async (req, res) => {
     try {
@@ -114,9 +118,9 @@ app.post(
   "/v1/dreams/interpret",
   handleRoute(async (req, res) => {
     const dreamContent = requireString(req.body?.dream_content, "dream_content");
-    const userPersonalInfo = requireString(req.body?.user_personal_info, "user_personal_info");
-    const userRecurringDreams = requireString(req.body?.user_recurring_dreams, "user_recurring_dreams");
-    const userDistilledInfo = requireString(req.body?.user_distilled_info, "user_distilled_info");
+    const userPersonalInfo = optionalString(req.body?.user_personal_info);
+    const userRecurringDreams = optionalString(req.body?.user_recurring_dreams);
+    const userDistilledInfo = optionalString(req.body?.user_distilled_info);
     const qaPairs = Array.isArray(req.body?.qa_pairs) ? req.body.qa_pairs : [];
 
     const normalizedPairs = qaPairs.map((pair, index) => ({
@@ -130,11 +134,11 @@ app.post(
         "You generate a structured dream interpretation. Return strictly JSON with keys: summary, keyThemes (array), interpretation, reflectionPrompt.",
       userPrompt: `Dream content:\n${dreamContent}
 
-User personal info:\n${userPersonalInfo}
+User personal info:\n${userPersonalInfo || "(none provided)"}
 
-Recurring dreams:\n${userRecurringDreams}
+Recurring dreams:\n${userRecurringDreams || "(none provided)"}
 
-User distilled info:\n${userDistilledInfo}
+User distilled info:\n${userDistilledInfo || "(none provided)"}
 
 QA pairs:\n${JSON.stringify(normalizedPairs, null, 2)}`
     });
@@ -163,14 +167,14 @@ QA pairs:\n${JSON.stringify(normalizedPairs, null, 2)}`
 app.post(
   "/v1/dreams/update-soul",
   handleRoute(async (req, res) => {
-    const coreInformation = requireString(req.body?.core_information, "core_information");
+    const coreInformation = optionalString(req.body?.core_information);
     const newInformation = requireString(req.body?.new_information, "new_information");
 
     const result = await callOpenAIJSON({
       model: updateSoulModel,
       systemPrompt:
         "You merge prior profile memory with new user info into one improved 'soul' profile. Return strictly JSON: {\"soul\":\"...\"}.",
-      userPrompt: `Core information:\n${coreInformation}\n\nNew information:\n${newInformation}`
+      userPrompt: `Core information:\n${coreInformation || "(none yet)"}\n\nNew information:\n${newInformation}`
     });
 
     const soul = requireString(result?.soul, "soul");
