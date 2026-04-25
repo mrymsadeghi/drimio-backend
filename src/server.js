@@ -1,7 +1,10 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 const dotenv = require("dotenv");
 const { callOpenAIJSON } = require("./ai");
+const { requireAuth } = require("./auth");
 
 dotenv.config();
 
@@ -14,12 +17,35 @@ const interpretModel = process.env.OPENAI_MODEL_INTERPRET || "gpt-4.1";
 const updateSoulModel = process.env.OPENAI_MODEL_UPDATE_SOUL || "gpt-4.1";
 const defaultModel = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 
+app.set("trust proxy", 1);
+app.use(helmet());
 app.use(cors({ origin: allowedOrigin === "*" ? true : allowedOrigin }));
 app.use(express.json({ limit: "1mb" }));
+
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: Number(process.env.GLOBAL_RATE_LIMIT_PER_MIN || 120),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests. Please slow down." }
+});
+
+const aiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: Number(process.env.AI_RATE_LIMIT_PER_MIN || 20),
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.user?.id || ipKeyGenerator(req.ip),
+  message: { error: "Too many requests. Please slow down." }
+});
+
+app.use(globalLimiter);
 
 app.get("/health", (_req, res) => {
   res.json({ ok: true, service: "dreamio-backend" });
 });
+
+app.use("/v1/", requireAuth, aiLimiter);
 
 function requireString(value, fieldName) {
   if (typeof value !== "string" || value.trim().length === 0) {

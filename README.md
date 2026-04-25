@@ -24,14 +24,19 @@ All endpoints accept/return JSON.
    cp .env.example .env
    ```
 3. Set your values in `.env`:
-   - `OPENAI_API_KEY`
-   - Optional defaults:
+   - `OPENAI_API_KEY` (required)
+   - `SUPABASE_URL` (required for auth — e.g. `https://<project>.supabase.co`)
+   - Optional auth/rate-limit overrides:
+     - `REQUIRE_AUTH=false` — disables JWT verification (use only for local smoke tests)
+     - `GLOBAL_RATE_LIMIT_PER_MIN` (default `120`)
+     - `AI_RATE_LIMIT_PER_MIN` (default `20`, keyed per user)
+   - Optional model defaults:
      - `OPENAI_MODEL` (fallback, default `gpt-4.1-mini`)
      - `OPENAI_MODEL_TITLE` (default `gpt-4.1-mini`)
      - `OPENAI_MODEL_ANALYZE` (default `gpt-4.1`)
      - `OPENAI_MODEL_INTERPRET` (default `gpt-4.1`)
      - `OPENAI_MODEL_UPDATE_SOUL` (default `gpt-4.1`)
-   - Optional: `PORT`
+   - Optional: `PORT`, `ALLOWED_ORIGIN`
 4. Start server:
    ```bash
    npm start
@@ -55,9 +60,12 @@ Use a Node.js app in UltraHost panel:
 2. Upload this `backend` folder.
 3. Set app startup file: `src/server.js`.
 4. Add environment variables in UltraHost panel:
-   - `OPENAI_API_KEY`
+   - `OPENAI_API_KEY` (required)
+   - `SUPABASE_URL=https://<your-project>.supabase.co` (required for JWT auth)
    - `OPENAI_MODEL` (optional)
    - `ALLOWED_ORIGIN=*` (or your exact domain)
+   - `AI_RATE_LIMIT_PER_MIN=20` (optional, default 20)
+   - `GLOBAL_RATE_LIMIT_PER_MIN=120` (optional, default 120)
    - `PORT` (if panel requires one; otherwise UltraHost sets it)
 5. Run dependency install (`npm install`) in that app directory.
 6. Start/restart app from panel.
