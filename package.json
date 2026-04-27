@@ -1,7 +1,7 @@
 {
-  "name": "dreamio-backend",
+  "name": "drimio-backend",
   "version": "1.0.0",
-  "description": "Dreamio AI backend service",
+  "description": "Drimio AI backend service",
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {

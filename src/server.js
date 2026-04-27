@@ -42,7 +42,7 @@ const aiLimiter = rateLimit({
 app.use(globalLimiter);
 
 app.get("/health", (_req, res) => {
-  res.json({ ok: true, service: "dreamio-backend" });
+  res.json({ ok: true, service: "drimio-backend" });
 });
 
 app.use("/v1/", requireAuth, aiLimiter);
@@ -215,5 +215,5 @@ app.use((err, _req, res, _next) => {
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console
-  console.log(`Dreamio backend listening on port ${port}`);
+  console.log(`Drimio backend listening on port ${port}`);
 });

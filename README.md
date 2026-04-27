@@ -1,4 +1,4 @@
-# Dreamio Backend
+# Drimio Backend
 
 Node/Express backend that matches the iOS app API contract in `AIBackendService`.
 
@@ -44,7 +44,7 @@ All endpoints accept/return JSON.
 
 ## iOS app config
 
-Set `AI_BACKEND_BASE_URL` in `DreamioIOS/Secrets.xcconfig`, for example:
+Set `AI_BACKEND_BASE_URL` in `DrimioIOS/Secrets.xcconfig`, for example:
 
 ```xcconfig
 AI_BACKEND_BASE_URL=https://api.your-domain.com
