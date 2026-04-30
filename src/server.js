@@ -95,8 +95,8 @@ app.post(
     const result = await callOpenAIJSON({
       model: analyzeModel,
       systemPrompt:
-        "You are a reflective dream guide. Return strictly JSON with keys: output, Q1, Q2, Q3, optionally Q4 and Q5.",
-      userPrompt: `User name: ${userName}\nDream:\n${dream}\n\nWrite a short supportive reflection and 3-5 follow-up questions.`
+        "You are a reflective dream guide. You read users dream and return a short supportive reflection and 5 follow-up questions that would help with the jungian dream interpretation. Return strictly JSON with keys: output, Q1, Q2, Q3, optionally Q4 and Q5.",
+      userPrompt: `User name: ${userName}\nDream:\n${dream}`
     });
 
     const payload = {
@@ -157,7 +157,7 @@ app.post(
     const result = await callOpenAIJSON({
       model: interpretModel,
       systemPrompt:
-        "You generate a structured dream interpretation. Return strictly JSON with keys: summary, keyThemes (array), interpretation, reflectionPrompt.",
+        "You generate a structured dream interpretation based on the user's dream, personal info, recurring dreams, distilled info, and qa pairs. Use Jungian dream interpretation principles to interpret the dream. Make the key themes broad and short.Return strictly JSON with keys: summary, keyThemes (array), interpretation, reflectionPrompt.",
       userPrompt: `Dream content:\n${dreamContent}
 
 User personal info:\n${userPersonalInfo || "(none provided)"}
