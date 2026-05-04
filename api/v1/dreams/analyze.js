@@ -1,6 +1,6 @@
-const { callOpenAIJSON } = require("../../../_lib/ai");
-const { authenticate } = require("../../../_lib/auth");
-const { handleOptions, readBody, requireMethod, requireString, sendError, sendJSON } = require("../../../_lib/utils");
+const { callOpenAIJSON } = require("../../_lib/ai");
+const { authenticate } = require("../../_lib/auth");
+const { handleOptions, readBody, requireMethod, requireString, sendError, sendJSON } = require("../../_lib/utils");
 
 module.exports = async function handler(req, res) {
   try {
