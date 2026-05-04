@@ -19,7 +19,15 @@ module.exports = async function handler(req, res) {
       userPrompt: `Dream:\n${dream}\n\nReturn one concise title (max 8 words).`
     });
 
-    const title = requireString(result?.title, "title");
+    const rawTitle =
+      typeof result?.title === "string"
+        ? result.title
+        : typeof result?.output === "string"
+          ? result.output
+          : typeof result?.text === "string"
+            ? result.text
+            : "";
+    const title = requireString(rawTitle, "title");
     return sendJSON(req, res, 200, { title });
   } catch (error) {
     return sendError(req, res, error);
