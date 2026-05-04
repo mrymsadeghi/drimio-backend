@@ -1,9 +1,15 @@
-const { createRemoteJWKSet, jwtVerify } = require("jose");
-
 let jwksCache = null;
 let jwksUrl = null;
+let joseModulePromise = null;
 
-function getJWKS() {
+async function getJoseModule() {
+  if (!joseModulePromise) {
+    joseModulePromise = import("jose");
+  }
+  return joseModulePromise;
+}
+
+async function getJWKS() {
   const supabaseUrl = process.env.SUPABASE_URL;
   if (!supabaseUrl) {
     throw new Error("SUPABASE_URL env var is required for auth verification");
@@ -14,6 +20,7 @@ function getJWKS() {
     return jwksCache;
   }
 
+  const { createRemoteJWKSet } = await getJoseModule();
   jwksUrl = expectedUrl;
   jwksCache = createRemoteJWKSet(new URL(expectedUrl));
   return jwksCache;
@@ -37,7 +44,8 @@ async function authenticate(req) {
   }
 
   try {
-    const jwks = getJWKS();
+    const { jwtVerify } = await getJoseModule();
+    const jwks = await getJWKS();
     const { payload } = await jwtVerify(token, jwks, {
       issuer: `${process.env.SUPABASE_URL.replace(/\/$/, "")}/auth/v1`
     });
