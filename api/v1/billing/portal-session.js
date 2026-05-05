@@ -1,6 +1,6 @@
-const { authenticate } = require("../../../_lib/auth");
-const { handleOptions, requireMethod, sendError, sendJSON } = require("../../../_lib/utils");
-const { createPortalSessionForUser } = require("../../../_lib/billing");
+const { authenticate } = require("../../_lib/auth");
+const { handleOptions, requireMethod, sendError, sendJSON } = require("../../_lib/utils");
+const { createPortalSessionForUser } = require("../../_lib/billing");
 
 module.exports = async function handler(req, res) {
   try {

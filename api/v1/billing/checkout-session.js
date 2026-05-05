@@ -1,4 +1,4 @@
-const { authenticate } = require("../../../_lib/auth");
+const { authenticate } = require("../../_lib/auth");
 const {
   handleOptions,
   readBody,
@@ -6,8 +6,8 @@ const {
   requireString,
   sendError,
   sendJSON
-} = require("../../../_lib/utils");
-const { createCheckoutSessionForUser } = require("../../../_lib/billing");
+} = require("../../_lib/utils");
+const { createCheckoutSessionForUser } = require("../../_lib/billing");
 
 module.exports = async function handler(req, res) {
   try {
