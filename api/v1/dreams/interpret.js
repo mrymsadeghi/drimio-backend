@@ -23,10 +23,12 @@ module.exports = async function handler(req, res) {
     const userDistilledInfo = optionalString(body?.user_distilled_info);
     const qaPairs = Array.isArray(body?.qa_pairs) ? body.qa_pairs : [];
 
-    const normalizedPairs = qaPairs.map((pair, index) => ({
-      question: requireString(pair?.question, `qa_pairs[${index}].question`),
-      answer: requireString(pair?.answer, `qa_pairs[${index}].answer`)
-    }));
+    const normalizedPairs = qaPairs
+      .map((pair) => ({
+        question: typeof pair?.question === "string" ? pair.question.trim() : "",
+        answer: typeof pair?.answer === "string" ? pair.answer.trim() : ""
+      }))
+      .filter((pair) => pair.question.length > 0 && pair.answer.length > 0);
 
     const model = process.env.OPENAI_MODEL_INTERPRET || "gpt-4.1";
     const result = await callOpenAIJSON({
