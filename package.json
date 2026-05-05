@@ -12,11 +12,13 @@
     "node": "20.x"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.105.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
     "express-rate-limit": "^8.4.1",
     "helmet": "^8.1.0",
-    "jose": "^6.2.2"
+    "jose": "^6.2.2",
+    "stripe": "^22.1.0"
   }
 }

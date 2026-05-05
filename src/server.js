@@ -5,6 +5,11 @@ const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 const dotenv = require("dotenv");
 const { callOpenAIJSON } = require("./ai");
 const { requireAuth } = require("./auth");
+const {
+  createCheckoutSessionForUser,
+  createPortalSessionForUser,
+  handleStripeWebhook
+} = require("./billing");
 
 dotenv.config();
 
@@ -20,6 +25,17 @@ const defaultModel = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 app.set("trust proxy", 1);
 app.use(helmet());
 app.use(cors({ origin: allowedOrigin === "*" ? true : allowedOrigin }));
+
+app.post("/webhooks/stripe", express.raw({ type: "application/json" }), async (req, res) => {
+  try {
+    await handleStripeWebhook(req.body, req.headers["stripe-signature"]);
+    res.json({ received: true });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Invalid Stripe webhook";
+    res.status(400).json({ error: message });
+  }
+});
+
 app.use(express.json({ limit: "1mb" }));
 
 const globalLimiter = rateLimit({
@@ -68,6 +84,29 @@ function handleRoute(handler) {
     }
   };
 }
+
+app.post(
+  "/v1/billing/checkout-session",
+  handleRoute(async (req, res) => {
+    const plan = requireString(req.body?.plan, "plan").toLowerCase();
+    const url = await createCheckoutSessionForUser({
+      userId: req.user.id,
+      email: req.user.email,
+      plan
+    });
+    res.json({ url });
+  })
+);
+
+app.post(
+  "/v1/billing/portal-session",
+  handleRoute(async (req, res) => {
+    const url = await createPortalSessionForUser({
+      userId: req.user.id
+    });
+    res.json({ url });
+  })
+);
 
 app.post(
   "/v1/dreams/title",

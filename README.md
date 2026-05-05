@@ -10,6 +10,9 @@ Node/Express backend that matches the iOS app API contract in `AIBackendService`
 - `POST /v1/dreams/distill`
 - `POST /v1/dreams/interpret`
 - `POST /v1/dreams/update-soul`
+- `POST /v1/billing/checkout-session`
+- `POST /v1/billing/portal-session`
+- `POST /webhooks/stripe`
 
 All endpoints accept/return JSON.
 
@@ -26,7 +29,16 @@ All endpoints accept/return JSON.
 3. Set your values in `.env`:
    - `OPENAI_API_KEY` (required)
    - `SUPABASE_URL` (required for auth — e.g. `https://<project>.supabase.co`)
-   - Optional auth/rate-limit overrides:
+  - Supabase:
+    - `SUPABASE_URL` (required for JWT auth)
+    - `SUPABASE_SERVICE_ROLE_KEY` (required for Stripe webhook membership sync)
+  - Stripe:
+    - `STRIPE_SECRET_KEY`
+    - `STRIPE_WEBHOOK_SECRET` (recommended; allows webhook signature verification)
+    - `STRIPE_PRICE_ID_MONTHLY`
+    - `STRIPE_PRICE_ID_YEARLY`
+    - `APP_BASE_URL` (e.g. `https://my.drimio.app`, used for redirect URLs)
+  - Optional auth/rate-limit overrides:
      - `REQUIRE_AUTH=false` — disables JWT verification (use only for local smoke tests)
      - `GLOBAL_RATE_LIMIT_PER_MIN` (default `120`)
      - `AI_RATE_LIMIT_PER_MIN` (default `20`, keyed per user)
@@ -36,7 +48,7 @@ All endpoints accept/return JSON.
      - `OPENAI_MODEL_ANALYZE` (default `gpt-4.1`)
      - `OPENAI_MODEL_INTERPRET` (default `gpt-4.1`)
      - `OPENAI_MODEL_UPDATE_SOUL` (default `gpt-4.1`)
-   - Optional: `PORT`, `ALLOWED_ORIGIN`
+  - Optional: `PORT`, `ALLOWED_ORIGIN`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`, `STRIPE_PORTAL_RETURN_URL`
 4. Start server:
    ```bash
    npm start
