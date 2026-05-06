@@ -12,6 +12,7 @@ Node/Express backend that matches the iOS app API contract in `AIBackendService`
 - `POST /v1/dreams/update-soul`
 - `POST /v1/billing/checkout-session`
 - `POST /v1/billing/portal-session`
+- `POST /v1/account/delete`
 - `POST /webhooks/stripe`
 
 All endpoints accept/return JSON.

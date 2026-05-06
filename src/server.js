@@ -3,6 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 const dotenv = require("dotenv");
+const { createClient } = require("@supabase/supabase-js");
 const { callOpenAIJSON } = require("./ai");
 const { requireAuth } = require("./auth");
 const {
@@ -21,6 +22,7 @@ const analyzeModel = process.env.OPENAI_MODEL_ANALYZE || "gpt-4.1";
 const interpretModel = process.env.OPENAI_MODEL_INTERPRET || "gpt-4.1";
 const updateSoulModel = process.env.OPENAI_MODEL_UPDATE_SOUL || "gpt-4.1";
 const defaultModel = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+let supabaseAdmin = null;
 
 app.set("trust proxy", 1);
 app.use(helmet());
@@ -62,6 +64,26 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/v1/", requireAuth, aiLimiter);
+
+function getSupabaseAdmin() {
+  if (supabaseAdmin) return supabaseAdmin;
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+  }
+  supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false },
+  });
+  return supabaseAdmin;
+}
+
+async function deleteTableRows(supabase, table, column, value) {
+  const { error } = await supabase.from(table).delete().eq(column, value);
+  if (error) {
+    throw new Error(`Failed to delete ${table}: ${error.message}`);
+  }
+}
 
 function requireString(value, fieldName) {
   if (typeof value !== "string" || value.trim().length === 0) {
@@ -105,6 +127,27 @@ app.post(
       userId: req.user.id
     });
     res.json({ url });
+  })
+);
+
+app.post(
+  "/v1/account/delete",
+  handleRoute(async (req, res) => {
+    const userId = req.user.id;
+    const admin = getSupabaseAdmin();
+
+    await deleteTableRows(admin, "analyzer_chats", "user_id", userId);
+    await deleteTableRows(admin, "dreams", "user_id", userId);
+    await deleteTableRows(admin, "user_distilled_info", "user_id", userId);
+    await deleteTableRows(admin, "user_info", "user_id", userId);
+    await deleteTableRows(admin, "profiles", "id", userId);
+
+    const { error } = await admin.auth.admin.deleteUser(userId);
+    if (error) {
+      throw new Error(`Failed to delete auth user: ${error.message}`);
+    }
+
+    res.json({ success: true });
   })
 );
 
