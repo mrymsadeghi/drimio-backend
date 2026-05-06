@@ -1,4 +1,5 @@
 const { createClient } = require("@supabase/supabase-js");
+const WebSocket = require("ws");
 
 let supabaseAdmin = null;
 
@@ -26,6 +27,7 @@ function getSupabaseAdmin() {
 
   supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false },
+    realtime: { transport: WebSocket },
   });
 
   return supabaseAdmin;

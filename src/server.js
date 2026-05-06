@@ -4,6 +4,7 @@ const helmet = require("helmet");
 const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 const dotenv = require("dotenv");
 const { createClient } = require("@supabase/supabase-js");
+const WebSocket = require("ws");
 const { callOpenAIJSON } = require("./ai");
 const { requireAuth } = require("./auth");
 const {
@@ -81,6 +82,7 @@ function getSupabaseAdmin() {
   }
   supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false },
+    realtime: { transport: WebSocket },
   });
   return supabaseAdmin;
 }
