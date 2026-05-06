@@ -251,15 +251,11 @@ app.post(
       model: interpretModel,
       systemPrompt:
         "You generate a structured dream interpretation based on the user's dream, personal info, recurring dreams, distilled info, and qa pairs. Use Jungian dream interpretation principles to interpret the dream. Make the key themes broad and short.Return strictly JSON with keys: summary, keyThemes (array), interpretation, reflectionPrompt.",
-      userPrompt: `Dream content:\n${dreamContent}
-
-User personal info:\n${userPersonalInfo || "(none provided)"}
-
-Recurring dreams:\n${userRecurringDreams || "(none provided)"}
-
-User distilled info:\n${userDistilledInfo || "(none provided)"}
-
-QA pairs:\n${JSON.stringify(normalizedPairs, null, 2)}`
+      userPrompt: `- dream_content: ${dreamContent}
+- questions that the user answered about this dream: ${JSON.stringify(normalizedPairs, null, 2)}
+- user_personal_info: ${userPersonalInfo || "(none provided)"}
+- user has this recurring dreams: ${userRecurringDreams || "(none provided)"}
+- more information about the user: ${userDistilledInfo || "(none provided)"}`
     });
 
     const summary = requireString(result?.summary, "summary");
