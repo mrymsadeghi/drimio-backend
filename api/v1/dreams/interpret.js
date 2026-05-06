@@ -19,8 +19,7 @@ module.exports = async function handler(req, res) {
     const body = await readBody(req);
     const dreamContent = requireString(body?.dream_content, "dream_content");
     const userPersonalInfo = optionalString(body?.user_personal_info);
-    const userRecurringDreams = optionalString(body?.user_recurring_dreams);
-    const userDistilledInfo = optionalString(body?.user_distilled_info);
+    const userSoul = optionalString(body?.user_soul);
     const qaPairs = Array.isArray(body?.qa_pairs) ? body.qa_pairs : [];
 
     const normalizedPairs = qaPairs
@@ -38,8 +37,7 @@ module.exports = async function handler(req, res) {
       userPrompt: `- dream_content: ${dreamContent}
 - questions that the user answered about this dream: ${JSON.stringify(normalizedPairs, null, 2)}
 - user_personal_info: ${userPersonalInfo || "(none provided)"}
-- user has this recurring dreams: ${userRecurringDreams || "(none provided)"}
-- more information about the user: ${userDistilledInfo || "(none provided)"}`
+- more information about the user: ${userSoul || "(none provided)"}`
     });
 
     const summary = requireString(result?.summary, "summary");
